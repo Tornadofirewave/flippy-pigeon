@@ -11,6 +11,10 @@ public class LogicScript : MonoBehaviour
     public GameObject gameOverScreen;
 
     [ContextMenu("Increase Score")]
+    public void AddOneToScore()
+    {
+        addScore(1);
+    }
     public void addScore(int scoreToAdd)
     {
         playerScore = playerScore + scoreToAdd;
