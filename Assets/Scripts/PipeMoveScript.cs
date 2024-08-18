@@ -1,23 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PipeMoveScript : MonoBehaviour
 {
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float deadZone = -45f;
 
-    public float moveSpeed = 5;
-    public float deadZone = -45;
-    // Start is called before the first frame update
-    void Start()
+    private void Update()
     {
-        
+        Move();
+        CheckDeadZone();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Move()
     {
-        transform.position = transform.position + (Vector3.left * moveSpeed) * Time.deltaTime ;
+        transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
+    }
 
+    private void CheckDeadZone()
+    {
         if (transform.position.x < deadZone)
         {
             Debug.Log("Pipe Deleted.");

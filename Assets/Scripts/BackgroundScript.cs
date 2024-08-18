@@ -1,17 +1,16 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BackgroundScroller : MonoBehaviour
 {
-    public float scrollSpeed = 1f;
-    public GameObject backgroundPrefab;
-    public int numberOfBackgrounds = 2;
+    [SerializeField] private float scrollSpeed = 1f;
+    [SerializeField] private GameObject backgroundPrefab;
+    [SerializeField] private int numberOfBackgrounds = 2;
 
     private List<GameObject> backgrounds = new List<GameObject>();
     private float backgroundWidth;
 
-    void Start()
+    private void Start()
     {
         if (backgroundPrefab == null)
         {
@@ -19,38 +18,49 @@ public class BackgroundScroller : MonoBehaviour
             return;
         }
 
-        // Get the width of the background
+        InitializeBackgrounds();
+    }
+
+    private void Update()
+    {
+        MoveBackgrounds();
+    }
+
+    private void InitializeBackgrounds()
+    {
         backgroundWidth = backgroundPrefab.GetComponent<SpriteRenderer>().bounds.size.x;
 
-        // Spawn initial backgrounds
         for (int i = 0; i < numberOfBackgrounds; i++)
         {
             SpawnBackground(i * backgroundWidth);
         }
     }
 
-    void Update()
+    private void MoveBackgrounds()
     {
-        // Move all backgrounds
         for (int i = backgrounds.Count - 1; i >= 0; i--)
         {
             GameObject bg = backgrounds[i];
             bg.transform.Translate(Vector3.left * scrollSpeed * Time.deltaTime);
 
-            // If a background has moved off screen, destroy it and spawn a new one
             if (bg.transform.position.x < -backgroundWidth)
             {
-                backgrounds.RemoveAt(i);
-                Destroy(bg);
-                SpawnBackground(backgrounds[backgrounds.Count - 1].transform.position.x + backgroundWidth);
+                RecycleBackground(bg, i);
             }
         }
     }
 
-    void SpawnBackground(float xPosition)
+    private void SpawnBackground(float xPosition)
     {
-        GameObject newBg = Instantiate(backgroundPrefab, new Vector3(xPosition, 0, 0), Quaternion.identity);
-        newBg.transform.SetParent(transform);
+        GameObject newBg = Instantiate(backgroundPrefab, new Vector3(xPosition, 0, 0), Quaternion.identity, transform);
         backgrounds.Add(newBg);
+    }
+
+    private void RecycleBackground(GameObject bg, int index)
+    {
+        backgrounds.RemoveAt(index);
+        float newXPosition = backgrounds[backgrounds.Count - 1].transform.position.x + backgroundWidth;
+        bg.transform.position = new Vector3(newXPosition, 0, 0);
+        backgrounds.Add(bg);
     }
 }

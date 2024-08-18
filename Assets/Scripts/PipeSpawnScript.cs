@@ -1,40 +1,46 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PipeSpawner : MonoBehaviour
 {
-    public GameObject pipePrefab;
-    public float spawnRate = 2f;
-    public float heightOffset = 10f;
+    [SerializeField] private GameObject pipePrefab;
+    [SerializeField] private float spawnRate = 2f;
+    [SerializeField] private float heightOffset = 10f;
 
-    private float nextSpawnTime = 0f;
+    private float nextSpawnTime;
 
-    void Start()
+    private void Start()
     {
-        // Spawn a pipe immediately
         SpawnPipe();
-        // Set the next spawn time
-        nextSpawnTime = Time.time + spawnRate;
+        SetNextSpawnTime();
     }
 
-    void Update()
+    private void Update()
     {
         if (Time.time > nextSpawnTime)
         {
             SpawnPipe();
-            nextSpawnTime = Time.time + spawnRate;
+            SetNextSpawnTime();
         }
     }
 
-    void SpawnPipe()
+    private void SpawnPipe()
     {
+        if (pipePrefab == null)
+        {
+            Debug.LogError("Pipe prefab is not assigned!");
+            return;
+        }
+
         float lowestPoint = transform.position.y - heightOffset;
         float highestPoint = transform.position.y + heightOffset;
         float spawnY = Random.Range(lowestPoint, highestPoint);
         Vector3 spawnPosition = new Vector3(transform.position.x, spawnY, 0);
 
-        GameObject newPipe = Instantiate(pipePrefab, spawnPosition, Quaternion.identity);
-        newPipe.transform.SetParent(transform);
+        GameObject newPipe = Instantiate(pipePrefab, spawnPosition, Quaternion.identity, transform);
+    }
+
+    private void SetNextSpawnTime()
+    {
+        nextSpawnTime = Time.time + spawnRate;
     }
 }
